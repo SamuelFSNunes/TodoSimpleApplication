@@ -1,7 +1,6 @@
 package com.samuelnunes.todosimple.services;
 
 import com.samuelnunes.todosimple.models.User;
-import com.samuelnunes.todosimple.repositories.TaskRepository;
 import com.samuelnunes.todosimple.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
 
     public User findById(Long id){
         Optional<User> user = this.userRepository.findById(id);
@@ -28,7 +25,6 @@ public class UserService {
     public User create(User user){
         user.setId(null);
         user = this.userRepository.save(user);
-        this.taskRepository.saveAll(user.getTasks());
         return user;
     }
 
