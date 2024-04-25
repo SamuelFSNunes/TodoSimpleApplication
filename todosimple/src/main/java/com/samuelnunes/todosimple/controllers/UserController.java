@@ -33,7 +33,7 @@ public class UserController {
                 .path("/{id}").buildAndExpand(obj.getId()).toUri();
         return ResponseEntity.created(uri).body(obj);
     }
-    @PutMapping
+    @PutMapping("/{id}")
     @Validated(User.UpdateUser.class)
     public ResponseEntity<User> updateUser(@RequestBody @Valid User obj, @PathVariable Long id) {
         obj.setId(id);
