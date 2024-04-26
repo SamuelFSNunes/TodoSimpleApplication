@@ -19,6 +19,10 @@ public class TaskService {
     @Autowired
     private UserService userService;
 
+    public List<Task> findAllTasks() {
+        return taskRepository.findAll();
+    }
+
     public Task findById(Long id) {
         Optional<Task> task = this.taskRepository.findById(id);
         return task.orElseThrow(() -> new RuntimeException("Task not found, Id: "+ id + ", Type: "+ Task.class.getName()));
