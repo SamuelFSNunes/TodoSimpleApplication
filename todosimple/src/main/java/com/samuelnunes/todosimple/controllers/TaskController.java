@@ -2,6 +2,7 @@ package com.samuelnunes.todosimple.controllers;
 
 import com.samuelnunes.todosimple.models.Task;
 import com.samuelnunes.todosimple.services.TaskService;
+import com.samuelnunes.todosimple.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<Task> findById(@PathVariable Long id) {
@@ -54,6 +57,7 @@ public class TaskController {
     }
     @GetMapping("/user/{user_id}")
     public ResponseEntity<List<Task>> findAllByUserId(@PathVariable Long user_id) {
+        userService.findById(user_id);
         List<Task> tasks = taskService.findAllByUserId(user_id);
         return ResponseEntity.ok().body(tasks);
     }
