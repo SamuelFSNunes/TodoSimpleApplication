@@ -1,5 +1,6 @@
 package com.samuelnunes.todosimple.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -98,6 +99,7 @@ public class User {
         return result;
     }
 
+    @JsonIgnore
     public List<Task> getTasks() {
         return tasks;
     }
