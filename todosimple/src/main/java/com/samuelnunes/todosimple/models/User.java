@@ -6,14 +6,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = User.TABLE_NAME)
-public class User {
+public class User implements UserDetails {
 
     public interface CreateUser{}
     public interface UpdateUser{}
@@ -31,11 +35,16 @@ public class User {
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password", nullable = false, length = 30)
+    @Column(name = "password", nullable = false, length = 254)
     @NotNull(groups = {CreateUser.class, UpdateUser.class})
     @NotEmpty(groups = {CreateUser.class, UpdateUser.class})
-    @Size(groups = {CreateUser.class, UpdateUser.class}, min = 8, max = 100)
+    @Size(groups = {CreateUser.class, UpdateUser.class}, min = 8)
     private String password;
+
+    @Column(name = "role", unique = false, nullable = false)
+    @NotNull(groups = {CreateUser.class, UpdateUser.class})
+    @NotEmpty(groups = {CreateUser.class, UpdateUser.class})
+    private UserRole role;
 
     @OneToMany(mappedBy = "user")
     private List<Task> tasks = new ArrayList<Task>();
@@ -43,10 +52,17 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String username, String password) {
+    public User(Long id, String username, String password, UserRole role) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.role = role;
+    }
+
+    public User(String username, String password, UserRole role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
     public Long getId() {
@@ -61,8 +77,45 @@ public class User {
         return username;
     }
 
+    public String getRole(){
+        return role.toString();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.role == UserRole.ADMIN){
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_USER"));
+        }else{
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+        }
     }
 
     public String getPassword() {
